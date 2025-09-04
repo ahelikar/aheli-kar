@@ -36,8 +36,6 @@ classifier.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metri
 
 """Loading image dataset"""
 
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-train_datagen=ImageDataGenerator(rescale=1./255,shear_range=0.2,zoom_range=0.2,horizontal_flip=True)
 
 fashion_mnist = tf.keras.datasets.fashion_mnist
 
@@ -46,6 +44,33 @@ fashion_mnist = tf.keras.datasets.fashion_mnist
 train_labels
 
 test_images
+from keras.applications import VGG16
+
+# Specify the input shape for the VGG16 model (at least 32x32 with 3 channels)
+pretrained_model=VGG16(include_top=False,weights='imagenet', input_shape=(32, 32, 3))
+from tensorflow.keras import layers, models
+
+# Use the pre-trained VGG16 model as the base
+base_model = pretrained_model # pretrained_model is already defined in cell IKTbmlcBXDqI
+
+# Freeze the base model layers so they are not trained
+base_model.trainable = False
+
+# Create a new model on top of the base model
+model = models.Sequential([
+    base_model,
+    layers.Flatten(),
+    layers.Dense(10, activation='softmax') # Use 10 units for the Fashion MNIST classes
+])
+
+# Compile the new model
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.summary()
+
+
 
 """Plotting train images"""
 
